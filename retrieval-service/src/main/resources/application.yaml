@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: retrieval-service
+server:
+  port: 8083
