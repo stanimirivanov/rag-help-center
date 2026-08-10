@@ -10,7 +10,7 @@ Grafana-stack observability.
 
 ```bash
 docker-compose up -d
-./gradlew build
+./mvn install
 ```
 
 See `docs/` for the full design and implementation plan.
