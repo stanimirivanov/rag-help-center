@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class IngestionServiceApplication
+class AdminApiApplication
 
 fun main(args: Array<String>) {
-    runApplication<IngestionServiceApplication>(*args)
+    runApplication<AdminApiApplication>(*args)
 }

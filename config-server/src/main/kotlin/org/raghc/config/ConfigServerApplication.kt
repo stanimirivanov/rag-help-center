@@ -1,11 +1,11 @@
-package org.raghc.retrieval
+package org.raghc.config
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class IngestionServiceApplication
+class ConfigServerApplication
 
 fun main(args: Array<String>) {
-    runApplication<IngestionServiceApplication>(*args)
+    runApplication<ConfigServerApplication>(*args)
 }

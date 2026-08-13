@@ -1,11 +1,11 @@
-package org.raghc.embedding
+package org.raghc.qa
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class IngestionServiceApplication
+class QaServiceApplication
 
 fun main(args: Array<String>) {
-    runApplication<IngestionServiceApplication>(*args)
+    runApplication<QaServiceApplication>(*args)
 }
