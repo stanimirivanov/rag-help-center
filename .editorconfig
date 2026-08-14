@@ -17,7 +17,8 @@ indent_size = 2
 [*.{yml,yaml}]
 indent_size = 2
 
-# IntelliJ specific configuration overrides (Optional)
-[*.java]
-ij_java_use_single_class_imports = true
-ij_java_blank_lines_after_imports = 1
+# Kotlin
+[*.{kt,kts}]
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+ktlint_standard = enabled

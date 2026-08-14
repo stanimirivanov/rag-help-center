@@ -1,7 +1,15 @@
-.gradle/
-build/
-out/
-*.iml
+# Maven
+target/
+.flattened-pom.xml
+dependency-reduced-pom.xml
+
+# IDE
 .idea/
+*.iml
+out/
+
+# OS
 .DS_Store
-docker/build/
+
+# detekt report output (default location when no custom output path is configured)
+detekt/
