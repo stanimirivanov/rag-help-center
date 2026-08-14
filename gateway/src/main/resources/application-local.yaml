@@ -1,5 +1,12 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/rag_help_center
-    username: rag
-    password: rag
+  cloud:
+    gateway:
+      routes:
+        - id: ingestion
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/articles/**
+        - id: questions
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/v1/questions/**

@@ -6,6 +6,6 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 class IngestionServiceApplication
 
-fun main(args: Array<String>) {
-    runApplication<IngestionServiceApplication>(*args)
+fun main() {
+    runApplication<IngestionServiceApplication>()
 }
