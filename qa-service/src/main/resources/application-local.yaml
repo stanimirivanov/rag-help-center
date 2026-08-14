@@ -1,5 +1,10 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/rag_help_center
-    username: rag
-    password: rag
+  data:
+    mongodb:
+      uri: mongodb://rag:rag@localhost:27017/rag_help_center?authSource=admin
+    redis:
+      host: localhost
+      port: 6379
+  ai:
+    ollama:
+      base-url: http://localhost:11434

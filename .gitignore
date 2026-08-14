@@ -1,5 +1,6 @@
 # Maven
 target/
+.m2/
 .flattened-pom.xml
 dependency-reduced-pom.xml
 
