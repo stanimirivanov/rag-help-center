@@ -19,6 +19,8 @@ It does not attempt to be a generic CMS, ticketing system, identity provider, or
 
 ## 2. Architectural decisions
 
+Detailed decisions are recorded in `docs/decisions/`. In particular, [ADR 0001](decisions/0001-event-time-and-validation-ownership.md) defines ownership of domain occurrence time, database recording time, identity generation, and validation constraints.
+
 ### Five deployables, not seven
 
 | Module | Responsibility | Primary interfaces |

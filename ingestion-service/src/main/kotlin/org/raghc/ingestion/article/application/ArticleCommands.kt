@@ -2,13 +2,12 @@ package org.raghc.ingestion.article.application
 
 import org.raghc.ingestion.article.domain.ArticleContent
 import org.raghc.ingestion.article.domain.ArticleId
+import org.raghc.ingestion.article.domain.ArticleLocale
 import org.raghc.ingestion.article.domain.KnowledgeArticle
 import org.raghc.ingestion.article.domain.TenantId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.Clock
-import java.time.Instant
-import java.util.UUID
 
 data class CreateArticleCommand(
     val tenantId: TenantId,
@@ -33,16 +32,18 @@ data class ArticleCommandResult(
 @Service
 class ArticleCommandService(
     private val eventStore: ArticleEventStore,
+    private val articleIdGenerator: ArticleIdGenerator,
     private val clock: Clock,
 ) {
     @Transactional
     fun create(command: CreateArticleCommand): ArticleCommandResult {
+        val occurredAt = clock.instant()
         val article =
             KnowledgeArticle.create(
-                ArticleId(UUID.randomUUID()),
+                articleIdGenerator.next(),
                 command.tenantId,
-                ArticleContent(command.title, command.body, command.locale),
-                Instant.now(clock),
+                ArticleContent.create(command.title, command.body, ArticleLocale.of(command.locale)),
+                occurredAt,
             )
         eventStore.append(command.tenantId, article.id, 0, article.pendingEvents())
         article.markChangesCommitted()
@@ -59,7 +60,8 @@ class ArticleCommandService(
             throw ConcurrentArticleModificationException(command.expectedVersion, article.streamVersion)
         }
 
-        article.revise(command.title, command.body, Instant.now(clock))
+        val occurredAt = clock.instant()
+        article.revise(command.title, command.body, occurredAt)
         eventStore.append(command.tenantId, command.articleId, command.expectedVersion, article.pendingEvents())
         article.markChangesCommitted()
         return ArticleCommandResult(article.id, article.streamVersion)

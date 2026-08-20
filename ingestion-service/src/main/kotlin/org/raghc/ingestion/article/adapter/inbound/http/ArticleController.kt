@@ -8,7 +8,9 @@ import org.raghc.ingestion.article.application.ArticleCommandResult
 import org.raghc.ingestion.article.application.ArticleCommandService
 import org.raghc.ingestion.article.application.CreateArticleCommand
 import org.raghc.ingestion.article.application.ReviseArticleCommand
+import org.raghc.ingestion.article.domain.ArticleContent
 import org.raghc.ingestion.article.domain.ArticleId
+import org.raghc.ingestion.article.domain.ArticleLocale
 import org.raghc.ingestion.article.domain.TenantId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -77,14 +79,14 @@ class ArticleController(
 }
 
 data class CreateArticleRequest(
-    @field:NotBlank @field:Size(max = 200) val title: String,
-    @field:NotBlank @field:Size(max = 100_000) val body: String,
-    @field:Pattern(regexp = "^[a-z]{2,3}(-[A-Z]{2})?$") val locale: String,
+    @field:NotBlank @field:Size(max = ArticleContent.MAX_TITLE_LENGTH) val title: String,
+    @field:NotBlank @field:Size(max = ArticleContent.MAX_BODY_LENGTH) val body: String,
+    @field:Pattern(regexp = ArticleLocale.LANGUAGE_TAG_PATTERN) val locale: String,
 )
 
 data class ReviseArticleRequest(
-    @field:NotBlank @field:Size(max = 200) val title: String,
-    @field:NotBlank @field:Size(max = 100_000) val body: String,
+    @field:NotBlank @field:Size(max = ArticleContent.MAX_TITLE_LENGTH) val title: String,
+    @field:NotBlank @field:Size(max = ArticleContent.MAX_BODY_LENGTH) val body: String,
 )
 
 data class ArticleCommandResponse(

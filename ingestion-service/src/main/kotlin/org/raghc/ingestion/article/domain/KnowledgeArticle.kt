@@ -19,7 +19,7 @@ class KnowledgeArticle private constructor(
         body: String,
         occurredAt: Instant,
     ) {
-        val revised = ArticleContent(title, body, content.locale)
+        val revised = ArticleContent.create(title, body, content.locale)
         require(revised != content) { "revision must change the article content" }
         record(ArticleContentRevised(revised.title, revised.body, occurredAt))
     }
@@ -35,8 +35,13 @@ class KnowledgeArticle private constructor(
 
     private fun apply(event: ArticleEvent) {
         when (event) {
-            is ArticleCreated -> content = ArticleContent(event.title, event.body, event.locale)
-            is ArticleContentRevised -> content = ArticleContent(event.title, event.body, content.locale)
+            is ArticleCreated -> {
+                content = ArticleContent.create(event.title, event.body, ArticleLocale.of(event.locale))
+            }
+
+            is ArticleContentRevised -> {
+                content = ArticleContent.create(event.title, event.body, content.locale)
+            }
         }
         streamVersion++
     }
@@ -49,7 +54,7 @@ class KnowledgeArticle private constructor(
             occurredAt: Instant,
         ): KnowledgeArticle =
             KnowledgeArticle(id, tenantId).also {
-                it.record(ArticleCreated(content.title, content.body, content.locale, occurredAt))
+                it.record(ArticleCreated(content.title, content.body, content.locale.value, occurredAt))
             }
 
         fun rehydrate(

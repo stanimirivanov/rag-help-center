@@ -2,6 +2,7 @@ package org.raghc.ingestion.article.adapter.inbound.http
 
 import org.raghc.ingestion.article.application.ArticleNotFoundException
 import org.raghc.ingestion.article.application.ConcurrentArticleModificationException
+import org.raghc.ingestion.article.domain.InvalidArticleContentException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -21,6 +22,13 @@ class ArticleExceptionHandler {
             title = "Article version conflict"
             setProperty("expectedVersion", exception.expectedVersion)
             setProperty("actualVersion", exception.actualVersion)
+        }
+
+    @ExceptionHandler(InvalidArticleContentException::class)
+    fun invalidContent(exception: InvalidArticleContentException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.message.orEmpty()).apply {
+            title = "Invalid article content"
+            setProperty("violations", exception.violations.map { it.name })
         }
 
     @ExceptionHandler(InvalidVersionPreconditionException::class, IllegalArgumentException::class)

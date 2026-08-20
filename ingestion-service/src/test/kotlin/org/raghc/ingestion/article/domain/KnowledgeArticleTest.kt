@@ -17,7 +17,7 @@ class KnowledgeArticleTest {
             KnowledgeArticle.create(
                 articleId,
                 tenantId,
-                ArticleContent("Reset a password", "Choose Forgot password.", "en"),
+                content("Reset a password", "Choose Forgot password."),
                 createdAt,
             )
 
@@ -55,7 +55,7 @@ class KnowledgeArticleTest {
             KnowledgeArticle.create(
                 articleId,
                 tenantId,
-                ArticleContent("Reset a password", "Instructions", "en"),
+                content("Reset a password", "Instructions"),
                 createdAt,
             )
 
@@ -64,4 +64,9 @@ class KnowledgeArticleTest {
         }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("must change")
     }
+
+    private fun content(
+        title: String,
+        body: String,
+    ): ArticleContent = ArticleContent.create(title, body, ArticleLocale.of("en"))
 }

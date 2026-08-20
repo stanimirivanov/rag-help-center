@@ -1,10 +1,12 @@
 package org.raghc.ingestion.article
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.MediaType
+import org.springframework.jdbc.core.simple.JdbcClient
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -19,6 +21,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.postgresql.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @SpringBootTest
@@ -27,6 +30,7 @@ import java.util.UUID
 @Testcontainers(disabledWithoutDocker = true)
 class ArticleApiIntegrationTest(
     @Autowired private val mockMvc: MockMvc,
+    @Autowired private val jdbcClient: JdbcClient,
 ) {
     @Test
     fun `publishes the article command OpenAPI contract`() {
@@ -54,6 +58,21 @@ class ArticleApiIntegrationTest(
                 .andReturn()
 
         val articleId = creation.response.getHeader("Location")!!.substringAfterLast('/')
+        val eventTimes =
+            jdbcClient
+                .sql(
+                    """
+                    select occurred_at, recorded_at
+                    from article_events
+                    where aggregate_id = :articleId
+                    """.trimIndent(),
+                ).param("articleId", UUID.fromString(articleId))
+                .query { resultSet, _ ->
+                    resultSet.getObject("occurred_at", OffsetDateTime::class.java) to
+                        resultSet.getObject("recorded_at", OffsetDateTime::class.java)
+                }.single()
+        assertThat(eventTimes.second).isAfterOrEqualTo(eventTimes.first)
+
         mockMvc
             .perform(
                 put("/api/v1/articles/{articleId}/content", articleId)
