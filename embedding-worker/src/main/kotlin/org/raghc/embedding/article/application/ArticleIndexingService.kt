@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ArticleIndexingService(
     private val chunker: ArticleChunker,
-    private val embeddingPort: TextEmbeddingPort,
     private val vectorProjection: ArticleVectorProjection,
     private val checkpoint: IndexingCheckpoint,
 ) {
@@ -36,9 +35,7 @@ class ArticleIndexingService(
                 requireNotNull(event.data.locale) { "published locale is required" },
             )
         val chunks = chunker.chunk(article)
-        val embeddings = embeddingPort.embed(chunks.map { it.content })
-        require(embeddings.size == chunks.size) { "embedding count must match chunk count" }
-        vectorProjection.replace(article, chunks, embeddings)
+        vectorProjection.replace(article, chunks)
         checkpoint.recordStatus(event, "INDEXED")
     }
 

@@ -8,6 +8,9 @@ spring:
       enable-auto-commit: false
       auto-offset-reset: earliest
   ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true
     ollama:
       embedding:
         options:

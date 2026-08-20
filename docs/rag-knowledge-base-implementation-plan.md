@@ -92,7 +92,7 @@ Acceptance criteria:
 - [x] redelivery does not duplicate chunks or status updates
 - [x] transient model failure retries; permanent bad input reaches the DLT
 - [x] withdrawal makes all article chunks ineligible for retrieval
-- [x] a deterministic fake embedding adapter covers the normal CI path
+- [x] a deterministic fake `EmbeddingModel` covers the normal CI path
 
 ## Phase 4 — Retrieval over internal REST
 
