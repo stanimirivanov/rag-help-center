@@ -20,6 +20,7 @@ It does not attempt to be a generic CMS, ticketing system, identity provider, or
 ## 2. Architectural decisions
 
 Detailed decisions are recorded in `docs/decisions/`. In particular, [ADR 0001](decisions/0001-event-time-and-validation-ownership.md) defines ownership of domain occurrence time, database recording time, identity generation, and validation constraints. [ADR 0002](decisions/0002-synchronous-projections-and-transactional-outbox.md) defines CQRS projection and integration-event consistency.
+For the asynchronous indexing boundary, [ADR 0003](decisions/0003-publication-integration-event-carries-revision-snapshot.md) defines the replayable publication snapshot contract.
 
 ### Five deployables, not seven
 
