@@ -67,9 +67,9 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] event append, projection update, and outbox insert commit or roll back together
+- [x] event append, projection update, and outbox insert commit or roll back together
 - [x] duplicate command keys return the original result
-- [ ] two publisher instances do not publish the same pending row concurrently
+- [x] two publisher instances do not publish the same pending row concurrently
 - [x] published integration envelopes contain tracing and version metadata
 - [x] replay rebuilds projections into an empty schema
 
