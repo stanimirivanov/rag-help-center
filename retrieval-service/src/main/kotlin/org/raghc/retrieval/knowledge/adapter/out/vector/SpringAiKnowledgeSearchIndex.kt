@@ -1,0 +1,59 @@
+package org.raghc.retrieval.knowledge.adapter.out.vector
+
+import org.raghc.retrieval.knowledge.application.KnowledgeChunk
+import org.raghc.retrieval.knowledge.application.KnowledgeSearchIndex
+import org.raghc.retrieval.knowledge.application.SearchKnowledgeQuery
+import org.springframework.ai.document.Document
+import org.springframework.ai.vectorstore.SearchRequest
+import org.springframework.ai.vectorstore.VectorStore
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder
+import org.springframework.stereotype.Repository
+import java.util.UUID
+
+@Repository
+class SpringAiKnowledgeSearchIndex(
+    private val vectorStore: VectorStore,
+) : KnowledgeSearchIndex {
+    override fun search(query: SearchKnowledgeQuery): List<KnowledgeChunk> {
+        val request =
+            SearchRequest
+                .builder()
+                .query(query.query)
+                .topK(query.topK)
+                .similarityThreshold(query.minimumScore)
+                .filterExpression(filters(query))
+                .build()
+        return vectorStore.similaritySearch(request).map { it.toKnowledgeChunk() }
+    }
+
+    private fun filters(query: SearchKnowledgeQuery) =
+        FilterExpressionBuilder().let { builder ->
+            val tenant = builder.eq(TENANT_ID, query.tenantId.toString())
+            query.locale?.let { builder.and(tenant, builder.eq(LOCALE, it)) }?.build() ?: tenant.build()
+        }
+
+    private fun Document.toKnowledgeChunk() =
+        KnowledgeChunk(
+            UUID.fromString(id),
+            UUID.fromString(metadata.requiredString(ARTICLE_ID)),
+            metadata.requiredNumber(REVISION).toLong(),
+            metadata.requiredNumber(CHUNK_INDEX).toInt(),
+            metadata.requiredString(LOCALE),
+            requireNotNull(text) { "vector document $id has no text content" },
+            requireNotNull(score) { "vector document $id has no similarity score" },
+        )
+
+    private fun Map<String, Any>.requiredString(key: String) =
+        this[key] as? String ?: error("vector document metadata $key must be a string")
+
+    private fun Map<String, Any>.requiredNumber(key: String) =
+        this[key] as? Number ?: error("vector document metadata $key must be a number")
+
+    private companion object {
+        const val TENANT_ID = "tenantId"
+        const val ARTICLE_ID = "articleId"
+        const val REVISION = "revision"
+        const val CHUNK_INDEX = "chunkIndex"
+        const val LOCALE = "locale"
+    }
+}
