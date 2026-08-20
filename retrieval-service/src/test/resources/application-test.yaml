@@ -1,3 +1,9 @@
 spring:
   application:
     name: retrieval-service-test
+  ai:
+    model:
+      embedding: none
+    vectorstore:
+      pgvector:
+        initialize-schema: true
