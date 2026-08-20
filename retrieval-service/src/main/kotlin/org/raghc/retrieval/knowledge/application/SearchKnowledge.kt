@@ -33,7 +33,11 @@ data class KnowledgeChunk(
     val score: Double,
 )
 
-fun interface KnowledgeSearchIndex {
+fun interface SemanticKnowledgeSearchIndex {
+    fun search(query: SearchKnowledgeQuery): List<KnowledgeChunk>
+}
+
+fun interface LexicalKnowledgeSearchIndex {
     fun search(query: SearchKnowledgeQuery): List<KnowledgeChunk>
 }
 
