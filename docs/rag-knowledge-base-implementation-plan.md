@@ -46,11 +46,11 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] create returns `201`, article ID, and stream version
-- [ ] revise with the current version succeeds; stale revision returns `409`
-- [ ] rehydrating the stream produces the expected aggregate state
-- [ ] domain tests require no Spring context
-- [ ] cross-tenant reads cannot observe the stream
+- [x] create returns `201`, article ID, and stream version
+- [x] revise with the current version succeeds; stale revision returns `409`
+- [x] rehydrating the stream produces the expected aggregate state
+- [x] domain tests require no Spring context
+- [x] cross-tenant reads cannot observe the stream
 
 ## Phase 2 — Publication, projections, and transactional outbox
 
