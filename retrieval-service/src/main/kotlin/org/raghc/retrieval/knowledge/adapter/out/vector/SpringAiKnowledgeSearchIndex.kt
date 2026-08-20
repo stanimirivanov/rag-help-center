@@ -1,8 +1,8 @@
 package org.raghc.retrieval.knowledge.adapter.out.vector
 
 import org.raghc.retrieval.knowledge.application.KnowledgeChunk
-import org.raghc.retrieval.knowledge.application.KnowledgeSearchIndex
 import org.raghc.retrieval.knowledge.application.SearchKnowledgeQuery
+import org.raghc.retrieval.knowledge.application.SemanticKnowledgeSearchIndex
 import org.springframework.ai.document.Document
 import org.springframework.ai.vectorstore.SearchRequest
 import org.springframework.ai.vectorstore.VectorStore
@@ -13,7 +13,7 @@ import java.util.UUID
 @Repository
 class SpringAiKnowledgeSearchIndex(
     private val vectorStore: VectorStore,
-) : KnowledgeSearchIndex {
+) : SemanticKnowledgeSearchIndex {
     override fun search(query: SearchKnowledgeQuery): List<KnowledgeChunk> {
         val request =
             SearchRequest

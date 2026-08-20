@@ -2,6 +2,7 @@ package org.raghc.retrieval.knowledge.adapter.out.vector
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.raghc.retrieval.knowledge.adapter.out.persistence.PostgresFullTextKnowledgeSearchIndex
 import org.raghc.retrieval.knowledge.application.SearchKnowledgeQuery
 import org.springframework.ai.document.Document
 import org.springframework.ai.embedding.AbstractEmbeddingModel
@@ -30,6 +31,7 @@ import java.util.UUID
 class TenantIsolationIntegrationTest(
     @Autowired private val vectorStore: VectorStore,
     @Autowired private val searchIndex: SpringAiKnowledgeSearchIndex,
+    @Autowired private val fullTextIndex: PostgresFullTextKnowledgeSearchIndex,
 ) {
     @Test
     fun `database search never crosses tenant or locale boundaries`() {
@@ -58,6 +60,29 @@ class TenantIsolationIntegrationTest(
         assertThat(results).hasSize(1)
         assertThat(results.single().articleId).isEqualTo(expectedArticle)
         assertThat(results.single().content).isEqualTo("Expected English result")
+
+        val lexicalResults =
+            fullTextIndex.search(
+                SearchKnowledgeQuery(
+                    requestedTenant,
+                    query = "Expected English",
+                    locale = "en",
+                    minimumScore = 0.0,
+                ),
+            )
+        assertThat(lexicalResults).hasSize(1)
+        assertThat(lexicalResults.single().articleId).isEqualTo(expectedArticle)
+
+        val allRequestedTenantLocales =
+            fullTextIndex.search(
+                SearchKnowledgeQuery(
+                    requestedTenant,
+                    query = "tenant",
+                    minimumScore = 0.0,
+                ),
+            )
+        assertThat(allRequestedTenantLocales).hasSize(1)
+        assertThat(allRequestedTenantLocales.single().locale).isEqualTo("de")
     }
 
     private fun document(
