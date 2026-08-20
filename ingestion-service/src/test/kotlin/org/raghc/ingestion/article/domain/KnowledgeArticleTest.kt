@@ -3,6 +3,7 @@ package org.raghc.ingestion.article.domain
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.Instant
 import java.util.UUID
 
@@ -63,6 +64,19 @@ class KnowledgeArticleTest {
             article.revise("Reset a password", "Instructions", createdAt.plusSeconds(1))
         }.isInstanceOf(IllegalArgumentException::class.java)
             .hasMessageContaining("must change")
+    }
+
+    @Test
+    fun `enforces publication withdrawal and restoration lifecycle`() {
+        val article = KnowledgeArticle.create(articleId, tenantId, content("Title", "Body"), createdAt)
+        article.publish(createdAt.plusSeconds(1))
+        article.withdraw(createdAt.plusSeconds(2))
+        article.restore(createdAt.plusSeconds(3))
+
+        assertThat(article.status).isEqualTo(ArticleStatus.PUBLISHED)
+        assertThat(article.revision).isEqualTo(1)
+        assertThat(article.streamVersion).isEqualTo(4)
+        assertThrows<InvalidArticleLifecycleException> { article.restore(createdAt.plusSeconds(4)) }
     }
 
     private fun content(

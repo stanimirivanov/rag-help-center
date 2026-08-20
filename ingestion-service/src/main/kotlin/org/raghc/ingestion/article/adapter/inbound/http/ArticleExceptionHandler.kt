@@ -2,7 +2,9 @@ package org.raghc.ingestion.article.adapter.inbound.http
 
 import org.raghc.ingestion.article.application.ArticleNotFoundException
 import org.raghc.ingestion.article.application.ConcurrentArticleModificationException
+import org.raghc.ingestion.article.application.IdempotencyKeyConflictException
 import org.raghc.ingestion.article.domain.InvalidArticleContentException
+import org.raghc.ingestion.article.domain.InvalidArticleLifecycleException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -22,6 +24,12 @@ class ArticleExceptionHandler {
             title = "Article version conflict"
             setProperty("expectedVersion", exception.expectedVersion)
             setProperty("actualVersion", exception.actualVersion)
+        }
+
+    @ExceptionHandler(IdempotencyKeyConflictException::class, InvalidArticleLifecycleException::class)
+    fun commandConflict(exception: RuntimeException): ProblemDetail =
+        ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.message.orEmpty()).apply {
+            title = "Article command conflict"
         }
 
     @ExceptionHandler(InvalidArticleContentException::class)

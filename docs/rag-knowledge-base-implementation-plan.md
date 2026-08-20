@@ -68,10 +68,10 @@ Scope:
 Acceptance criteria:
 
 - [ ] event append, projection update, and outbox insert commit or roll back together
-- [ ] duplicate command keys return the original result
+- [x] duplicate command keys return the original result
 - [ ] two publisher instances do not publish the same pending row concurrently
-- [ ] published integration envelopes contain tracing and version metadata
-- [ ] replay rebuilds projections into an empty schema
+- [x] published integration envelopes contain tracing and version metadata
+- [x] replay rebuilds projections into an empty schema
 
 ## Phase 3 — Asynchronous chunking and embedding
 
