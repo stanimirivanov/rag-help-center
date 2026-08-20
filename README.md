@@ -2,7 +2,7 @@
 
 A backend-only reference project for a versioned, AI-powered help center, built with Kotlin and the current Spring ecosystem. It combines a focused event-sourced article lifecycle with CQRS projections, Kafka-driven indexing, hybrid retrieval, and citation-grounded Q&A.
 
-**Phase 1 is complete:** the ingestion service supports creating and revising event-sourced article drafts with tenant-scoped PostgreSQL streams and optimistic concurrency. Phase 2 adds publication, query projections, and the transactional outbox.
+**Phase 2 is in progress:** the ingestion service now supports the article publication lifecycle, synchronous CQRS projections, command idempotency, projection replay, and a PostgreSQL transactional outbox with a lock-safe Spring Kafka relay. Kafka relay concurrency and rollback-focused acceptance tests remain before Phase 2 is marked complete.
 
 Current command API:
 

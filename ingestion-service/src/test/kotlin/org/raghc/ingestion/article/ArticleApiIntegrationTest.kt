@@ -117,6 +117,79 @@ class ArticleApiIntegrationTest(
             ).andExpect(status().isNotFound)
     }
 
+    @Test
+    fun `publishes projects and replays an article idempotently`() {
+        val tenantId = UUID.randomUUID()
+        val key = "create-${UUID.randomUUID()}"
+        val first = createArticle(tenantId, key)
+        val duplicate = createArticle(tenantId, key)
+        assertThat(duplicate.response.getHeader("Location")).isEqualTo(first.response.getHeader("Location"))
+        val articleId = first.response.getHeader("Location")!!.substringAfterLast('/')
+
+        mockMvc
+            .perform(
+                post("/api/v1/articles/{articleId}/publish", articleId)
+                    .header("X-Tenant-Id", tenantId)
+                    .header("If-Match", "\"1\"")
+                    .header("Idempotency-Key", "publish-${UUID.randomUUID()}"),
+            ).andExpect(status().isOk)
+            .andExpect(header().string("ETag", "\"2\""))
+
+        mockMvc
+            .perform(
+                get("/api/v1/articles/{articleId}/status", articleId).header("X-Tenant-Id", tenantId),
+            ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.lifecycleStatus").value("PUBLISHED"))
+            .andExpect(jsonPath("$.revision").value(1))
+            .andExpect(jsonPath("$.indexingStatus").value("PENDING"))
+
+        val envelope =
+            jdbcClient
+                .sql("select payload::text from article_outbox where aggregate_id = :articleId")
+                .param("articleId", UUID.fromString(articleId))
+                .query(String::class.java)
+                .single()
+        assertThat(envelope).contains("ArticlePublished").contains("schemaVersion").contains("traceId")
+
+        jdbcClient.sql("delete from article_projection").update()
+        mockMvc
+            .perform(post("/internal/v1/projections/articles/replay"))
+            .andExpect(status().isNoContent)
+        mockMvc
+            .perform(
+                get("/api/v1/articles/{articleId}", articleId).header("X-Tenant-Id", tenantId),
+            ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.lifecycleStatus").value("PUBLISHED"))
+    }
+
+    @Test
+    fun `rejects an idempotency key reused for different content`() {
+        val tenantId = UUID.randomUUID()
+        val key = "same-${UUID.randomUUID()}"
+        createArticle(tenantId, key)
+        mockMvc
+            .perform(
+                post("/api/v1/articles")
+                    .header("X-Tenant-Id", tenantId)
+                    .header("Idempotency-Key", key)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(CREATE_BODY.replace("Open account settings.", "Different content.")),
+            ).andExpect(status().isConflict)
+    }
+
+    private fun createArticle(
+        tenantId: UUID,
+        key: String,
+    ) = mockMvc
+        .perform(
+            post("/api/v1/articles")
+                .header("X-Tenant-Id", tenantId)
+                .header("Idempotency-Key", key)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(CREATE_BODY),
+        ).andExpect(status().isCreated)
+        .andReturn()
+
     companion object {
         private const val CREATE_BODY =
             """{"title":"Reset a password","body":"Open account settings.","locale":"en"}"""

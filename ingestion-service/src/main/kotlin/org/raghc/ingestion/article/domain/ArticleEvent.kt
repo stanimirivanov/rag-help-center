@@ -18,3 +18,16 @@ data class ArticleContentRevised(
     val body: String,
     override val occurredAt: Instant,
 ) : ArticleEvent
+
+data class ArticlePublished(
+    val revision: Long,
+    override val occurredAt: Instant,
+) : ArticleEvent
+
+data class ArticleWithdrawn(
+    override val occurredAt: Instant,
+) : ArticleEvent
+
+data class ArticleRestored(
+    override val occurredAt: Instant,
+) : ArticleEvent

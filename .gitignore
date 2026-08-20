@@ -7,7 +7,7 @@ dependency-reduced-pom.xml
 # IDE
 .idea/
 *.iml
-out/
+/out/
 
 # OS
 .DS_Store
