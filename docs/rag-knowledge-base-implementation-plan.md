@@ -90,7 +90,7 @@ Acceptance criteria:
 
 - [x] publication produces searchable chunks for exactly one revision
 - [x] redelivery does not duplicate chunks or status updates
-- [ ] transient model failure retries; permanent bad input reaches the DLT
+- [x] transient model failure retries; permanent bad input reaches the DLT
 - [x] withdrawal makes all article chunks ineligible for retrieval
 - [x] a deterministic fake embedding adapter covers the normal CI path
 
