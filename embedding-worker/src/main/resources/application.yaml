@@ -1,5 +1,22 @@
 spring:
   application:
     name: embedding-worker
+  flyway:
+    table: embedding_flyway_schema_history
+  kafka:
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+  ai:
+    ollama:
+      embedding:
+        options:
+          model: nomic-embed-text
+app:
+  embedding:
+    provider: ollama
+  kafka:
+    listener:
+      enabled: true
 server:
   port: 8082
