@@ -2,7 +2,14 @@
 
 A backend-only reference project for a versioned, AI-powered help center, built with Kotlin and the current Spring ecosystem. It combines a focused event-sourced article lifecycle with CQRS projections, Kafka-driven indexing, hybrid retrieval, and citation-grounded Q&A.
 
-The project is at **Phase 0 (buildable foundation)**. Business implementation starts with the article command slice in Phase 1.
+**Phase 1 is complete:** the ingestion service supports creating and revising event-sourced article drafts with tenant-scoped PostgreSQL streams and optimistic concurrency. Phase 2 adds publication, query projections, and the transactional outbox.
+
+Current command API:
+
+- `POST /api/v1/articles` creates a draft and returns `Location`, `ETag`, article ID, and stream version.
+- `PUT /api/v1/articles/{id}/content` revises a draft using `If-Match: "<stream-version>"`.
+- `X-Tenant-Id` supplies provisional tenant context until JWT claim extraction replaces it in Phase 6.
+- RFC 9457 problem details represent invalid commands, missing articles, and version conflicts.
 
 ## Architecture
 
