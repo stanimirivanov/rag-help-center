@@ -1,5 +1,13 @@
 spring:
   application:
     name: retrieval-service
+  ai:
+    ollama:
+      embedding:
+        options:
+          model: nomic-embed-text
+    vectorstore:
+      pgvector:
+        initialize-schema: false
 server:
   port: 8083
