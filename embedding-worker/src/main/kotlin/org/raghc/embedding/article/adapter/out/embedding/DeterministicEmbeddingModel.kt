@@ -1,24 +1,24 @@
 package org.raghc.embedding.article.adapter.out.embedding
 
-import org.raghc.embedding.article.application.TextEmbeddingPort
-import org.springframework.ai.embedding.EmbeddingModel
+import org.springframework.ai.document.Document
+import org.springframework.ai.embedding.AbstractEmbeddingModel
+import org.springframework.ai.embedding.Embedding
+import org.springframework.ai.embedding.EmbeddingRequest
+import org.springframework.ai.embedding.EmbeddingResponse
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
 @Component
-@ConditionalOnProperty(name = ["app.embedding.provider"], havingValue = "ollama", matchIfMissing = true)
-class SpringAiTextEmbeddingAdapter(
-    private val embeddingModel: EmbeddingModel,
-) : TextEmbeddingPort {
-    override fun embed(texts: List<String>): List<FloatArray> = embeddingModel.embed(texts)
-}
-
-@Component
 @ConditionalOnProperty(name = ["app.embedding.provider"], havingValue = "fake")
-class DeterministicTextEmbeddingAdapter : TextEmbeddingPort {
-    override fun embed(texts: List<String>): List<FloatArray> = texts.map(::embedding)
+class DeterministicEmbeddingModel : AbstractEmbeddingModel() {
+    override fun call(request: EmbeddingRequest) =
+        EmbeddingResponse(request.instructions.mapIndexed { index, text -> Embedding(embedding(text), index) })
+
+    override fun embed(document: Document): FloatArray = embedding(document.formattedContent)
+
+    override fun dimensions(): Int = DIMENSIONS
 
     private fun embedding(text: String): FloatArray {
         val digest = MessageDigest.getInstance("SHA-256").digest(text.toByteArray(StandardCharsets.UTF_8))

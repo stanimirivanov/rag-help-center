@@ -1,6 +1,9 @@
 spring:
   application:
     name: embedding-worker-test
+  ai:
+    model:
+      embedding: none
 app:
   embedding:
     provider: fake

@@ -2,7 +2,7 @@ package org.raghc.embedding.article.application
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.raghc.embedding.article.adapter.out.embedding.DeterministicTextEmbeddingAdapter
+import org.raghc.embedding.article.adapter.out.embedding.DeterministicEmbeddingModel
 import org.raghc.embedding.article.domain.ArticleChunk
 import org.raghc.embedding.article.domain.FixedWindowArticleChunker
 import org.raghc.embedding.article.domain.PublishedArticleRevision
@@ -14,8 +14,7 @@ class ArticleIndexingServiceTest {
     private val articleId = UUID.randomUUID()
     private val projection = RecordingProjection()
     private val checkpoint = RecordingCheckpoint()
-    private val embedding = CountingEmbeddingPort()
-    private val service = ArticleIndexingService(FixedWindowArticleChunker(), embedding, projection, checkpoint)
+    private val service = ArticleIndexingService(FixedWindowArticleChunker(), projection, checkpoint)
 
     @Test
     fun `indexes a publication once when the event is redelivered`() {
@@ -25,7 +24,6 @@ class ArticleIndexingServiceTest {
         service.handle(event)
 
         assertThat(projection.replacements).hasSize(1)
-        assertThat(embedding.invocations).isEqualTo(1)
         assertThat(checkpoint.statuses).containsExactly("INDEXED")
     }
 
@@ -65,19 +63,6 @@ class ArticleIndexingServiceTest {
             ),
         )
 
-    private class CountingEmbeddingPort : TextEmbeddingPort {
-        var invocations = 0
-
-        override fun embed(texts: List<String>): List<FloatArray> {
-            invocations++
-            return texts.map { FloatArray(EMBEDDING_DIMENSIONS) }
-        }
-
-        private companion object {
-            const val EMBEDDING_DIMENSIONS = 8
-        }
-    }
-
     private class RecordingProjection : ArticleVectorProjection {
         val replacements = mutableListOf<PublishedArticleRevision>()
         val withdrawn = mutableListOf<Pair<UUID, UUID>>()
@@ -85,7 +70,6 @@ class ArticleIndexingServiceTest {
         override fun replace(
             article: PublishedArticleRevision,
             chunks: List<ArticleChunk>,
-            embeddings: List<FloatArray>,
         ) {
             replacements += article
         }
@@ -116,13 +100,13 @@ class ArticleIndexingServiceTest {
     }
 }
 
-class DeterministicTextEmbeddingAdapterTest {
-    private val adapter = DeterministicTextEmbeddingAdapter()
+class DeterministicEmbeddingModelTest {
+    private val model = DeterministicEmbeddingModel()
 
     @Test
     fun `returns stable normalized embeddings without an external model`() {
-        val first = adapter.embed(listOf("same text", "different text"))
-        val replay = adapter.embed(listOf("same text", "different text"))
+        val first = model.embed(listOf("same text", "different text"))
+        val replay = model.embed(listOf("same text", "different text"))
 
         assertThat(replay.map(FloatArray::toList)).isEqualTo(first.map(FloatArray::toList))
         assertThat(first[0].toList()).isNotEqualTo(first[1].toList())

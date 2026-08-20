@@ -36,16 +36,15 @@ class ArticleVectorProjectionIntegrationTest(
 
         assertThat(count("embedding_inbox")).isEqualTo(1)
         assertThat(count("embedding_status_outbox")).isEqualTo(1)
-        assertThat(activeRevisions()).containsExactly(1L)
+        assertThat(indexedRevisions()).containsExactly(1L)
 
         indexingService.handle(event("ArticleRestored", 2))
 
-        assertThat(activeRevisions()).containsExactly(2L)
-        assertThat(inactiveRevisions()).contains(1L)
+        assertThat(indexedRevisions()).containsExactly(2L)
 
         indexingService.handle(event("ArticleWithdrawn", 2, includeContent = false))
 
-        assertThat(activeRevisions()).isEmpty()
+        assertThat(indexedRevisions()).isEmpty()
         assertThat(count("embedding_status_outbox")).isEqualTo(3)
     }
 
@@ -76,21 +75,16 @@ class ArticleVectorProjectionIntegrationTest(
             .query(Long::class.java)
             .single()
 
-    private fun activeRevisions(): List<Long> = revisions(active = true)
-
-    private fun inactiveRevisions(): List<Long> = revisions(active = false)
-
-    private fun revisions(active: Boolean): List<Long> =
+    private fun indexedRevisions(): List<Long> =
         jdbcClient
             .sql(
                 """
-                select distinct revision from article_chunks
-                where tenant_id = :tenantId and article_id = :articleId and active = :active
-                order by revision
+                select distinct (metadata->>'revision')::bigint as revision from vector_store
+                where metadata->>'tenantId' = :tenantId and metadata->>'articleId' = :articleId
+                order by (metadata->>'revision')::bigint
                 """.trimIndent(),
-            ).param("tenantId", tenantId)
-            .param("articleId", articleId)
-            .param("active", active)
+            ).param("tenantId", tenantId.toString())
+            .param("articleId", articleId.toString())
             .query { resultSet, _ -> resultSet.getLong("revision") }
             .list()
 
