@@ -111,7 +111,7 @@ Acceptance criteria:
 
 - [ ] known fixtures return correctly ranked, attributable chunks
 - [ ] low-relevance results are excluded
-- [ ] tenant isolation is tested at the vector query adapter
+- [x] tenant isolation is tested at the vector query adapter
 - [ ] OpenAPI contract validation protects client/server compatibility
 - [ ] HTTP timeouts and problem responses are explicit
 

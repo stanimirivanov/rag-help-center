@@ -2,7 +2,7 @@
 
 A backend-only reference project for a versioned, AI-powered help center, built with Kotlin and the current Spring ecosystem. It combines a focused event-sourced article lifecycle with CQRS projections, Kafka-driven indexing, hybrid retrieval, and citation-grounded Q&A.
 
-**Phase 4 is in progress:** the completed embedding pipeline provides deterministic chunking, Spring AI `EmbeddingModel`/`VectorStore` integration, transactional idempotency, pgvector revision replacement, and Kafka retry/DLT recovery. Retrieval now has a tenant-safe `SearchKnowledge` port, Spring AI semantic-search adapter, and versioned internal REST endpoint; hybrid ranking and database-backed isolation tests remain.
+**Phase 4 is in progress:** the completed embedding pipeline provides deterministic chunking, Spring AI `EmbeddingModel`/`VectorStore` integration, transactional idempotency, pgvector revision replacement, and Kafka retry/DLT recovery. Retrieval now has a tenant-safe `SearchKnowledge` port, Spring AI semantic-search adapter, versioned internal REST endpoint, and database-backed tenant/locale isolation coverage; PostgreSQL hybrid ranking remains.
 
 Current command API:
 
