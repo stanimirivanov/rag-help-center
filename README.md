@@ -2,7 +2,7 @@
 
 A backend-only reference project for a versioned, AI-powered help center, built with Kotlin and the current Spring ecosystem. It combines a focused event-sourced article lifecycle with CQRS projections, Kafka-driven indexing, hybrid retrieval, and citation-grounded Q&A.
 
-**Phase 2 is complete:** the ingestion service supports the article publication lifecycle, synchronous CQRS projections, command idempotency, projection replay, and a PostgreSQL transactional outbox with a lock-safe Spring Kafka relay. Phase 3 adds asynchronous chunking and embedding with deterministic CI substitutes for external AI models.
+**Phase 3 is in progress:** publication envelopes now carry immutable revision snapshots, and the embedding worker has deterministic fixed-window chunking with stable chunk IDs. Kafka consumption, idempotent pgvector replacement, retry/DLT handling, and deterministic fake embeddings are the next parts of the slice.
 
 Current command API:
 

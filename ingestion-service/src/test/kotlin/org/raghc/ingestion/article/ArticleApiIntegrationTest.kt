@@ -149,7 +149,13 @@ class ArticleApiIntegrationTest(
                 .param("articleId", UUID.fromString(articleId))
                 .query(String::class.java)
                 .single()
-        assertThat(envelope).contains("ArticlePublished").contains("schemaVersion").contains("traceId")
+        assertThat(envelope)
+            .contains("ArticlePublished")
+            .contains("schemaVersion")
+            .contains("traceId")
+            .contains("Reset a password")
+            .contains("Open account settings.")
+            .contains("\"revision\": 1")
 
         jdbcClient.sql("delete from article_projection").update()
         mockMvc

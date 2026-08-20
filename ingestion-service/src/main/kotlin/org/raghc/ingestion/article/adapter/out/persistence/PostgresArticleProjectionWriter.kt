@@ -121,7 +121,7 @@ class PostgresArticleProjectionWriter(
                 "aggregateId" to article.id.value,
                 "streamVersion" to streamVersion,
                 "occurredAt" to event.occurredAt,
-                "data" to objectMapper.readTree(encoded.payload),
+                "data" to integrationData(article, event),
             )
         jdbcClient
             .sql(
@@ -143,4 +143,29 @@ class PostgresArticleProjectionWriter(
             .param("occurredAt", event.occurredAt.atOffset(ZoneOffset.UTC))
             .update()
     }
+
+    private fun integrationData(
+        article: KnowledgeArticle,
+        event: ArticleEvent,
+    ): Any =
+        when (event) {
+            is ArticlePublished,
+            is ArticleRestored,
+            -> {
+                mapOf(
+                    "revision" to article.revision,
+                    "title" to article.content.title,
+                    "body" to article.content.body,
+                    "locale" to article.content.locale.value,
+                )
+            }
+
+            is ArticleWithdrawn -> {
+                mapOf("revision" to article.revision)
+            }
+
+            else -> {
+                objectMapper.readTree(codec.encode(event).payload)
+            }
+        }
 }
