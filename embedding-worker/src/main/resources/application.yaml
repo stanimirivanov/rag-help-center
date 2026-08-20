@@ -18,5 +18,6 @@ app:
   kafka:
     listener:
       enabled: true
+    article-events-dlt: help-center.article-events.v1.DLT
 server:
   port: 8082
