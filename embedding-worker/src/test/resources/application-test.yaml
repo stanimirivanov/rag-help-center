@@ -1,3 +1,9 @@
 spring:
   application:
     name: embedding-worker-test
+app:
+  embedding:
+    provider: fake
+  kafka:
+    listener:
+      enabled: false
