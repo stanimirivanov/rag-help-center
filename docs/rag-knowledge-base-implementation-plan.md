@@ -88,11 +88,11 @@ Scope:
 
 Acceptance criteria:
 
-- [ ] publication produces searchable chunks for exactly one revision
-- [ ] redelivery does not duplicate chunks or status updates
+- [x] publication produces searchable chunks for exactly one revision
+- [x] redelivery does not duplicate chunks or status updates
 - [ ] transient model failure retries; permanent bad input reaches the DLT
-- [ ] withdrawal makes all article chunks ineligible for retrieval
-- [ ] a deterministic fake embedding adapter covers the normal CI path
+- [x] withdrawal makes all article chunks ineligible for retrieval
+- [x] a deterministic fake embedding adapter covers the normal CI path
 
 ## Phase 4 — Retrieval over internal REST
 
