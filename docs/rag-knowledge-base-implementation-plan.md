@@ -107,6 +107,12 @@ Scope:
 - score threshold, bounded `topK`, deduplication, and citation metadata
 - Spring HTTP Service client contract and integration/contract tests
 
+Progress:
+
+- [x] retrieval and QA contracts accept an optional tenant-scoped `collectionId`
+- [x] semantic and lexical adapters enforce collection isolation
+- [ ] ingestion and embedding propagate immutable article collection membership
+
 Acceptance criteria:
 
 - [x] known fixtures return correctly ranked, attributable chunks

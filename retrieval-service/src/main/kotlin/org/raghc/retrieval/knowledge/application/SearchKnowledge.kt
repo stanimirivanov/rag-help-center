@@ -8,6 +8,7 @@ data class SearchKnowledgeQuery(
     val locale: String? = null,
     val topK: Int = DEFAULT_TOP_K,
     val minimumScore: Double = DEFAULT_MINIMUM_SCORE,
+    val collectionId: UUID? = null,
 ) {
     init {
         require(query.isNotBlank()) { "query must not be blank" }

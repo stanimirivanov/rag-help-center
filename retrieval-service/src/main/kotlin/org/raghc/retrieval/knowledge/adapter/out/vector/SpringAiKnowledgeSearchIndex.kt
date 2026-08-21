@@ -31,8 +31,10 @@ class SpringAiKnowledgeSearchIndex(
 
     private fun filters(query: SearchKnowledgeQuery) =
         FilterExpressionBuilder().let { builder ->
-            val tenant = builder.eq(TENANT_ID, query.tenantId.toString())
-            query.locale?.let { builder.and(tenant, builder.eq(LOCALE, it)) }?.build() ?: tenant.build()
+            var filters = builder.eq(TENANT_ID, query.tenantId.toString())
+            query.collectionId?.let { filters = builder.and(filters, builder.eq(COLLECTION_ID, it.toString())) }
+            query.locale?.let { filters = builder.and(filters, builder.eq(LOCALE, it)) }
+            filters.build()
         }
 
     private fun Document.toKnowledgeChunk() =
@@ -55,6 +57,7 @@ class SpringAiKnowledgeSearchIndex(
     private companion object {
         const val TENANT_ID = "tenantId"
         const val ARTICLE_ID = "articleId"
+        const val COLLECTION_ID = "collectionId"
         const val REVISION = "revision"
         const val CHUNK_INDEX = "chunkIndex"
         const val LOCALE = "locale"

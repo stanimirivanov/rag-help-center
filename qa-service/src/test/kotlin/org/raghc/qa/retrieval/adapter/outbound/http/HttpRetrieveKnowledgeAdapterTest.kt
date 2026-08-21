@@ -24,6 +24,7 @@ class HttpRetrieveKnowledgeAdapterTest {
     @Test
     fun `sends the retrieval contract and maps its response`() {
         val tenantId = UUID.randomUUID()
+        val collectionId = UUID.randomUUID()
         val chunkId = UUID.randomUUID()
         val articleId = UUID.randomUUID()
         var receivedTenant: String? = null
@@ -47,11 +48,22 @@ class HttpRetrieveKnowledgeAdapterTest {
         }
 
         val adapter = createAdapter(Duration.ofSeconds(2))
-        val chunks = adapter.retrieve(RetrievalQuery(tenantId, "How do I reset it?", "en-US", 5, 0.7))
+        val chunks =
+            adapter.retrieve(
+                RetrievalQuery(
+                    tenantId,
+                    "How do I reset it?",
+                    "en-US",
+                    5,
+                    0.7,
+                    collectionId,
+                ),
+            )
 
         assertThat(receivedTenant).isEqualTo(tenantId.toString())
         assertThat(receivedBody).contains(
             "\"query\":\"How do I reset it?\"",
+            "\"collectionId\":\"$collectionId\"",
             "\"locale\":\"en-US\"",
             "\"topK\":5",
             "\"minimumScore\":0.7",

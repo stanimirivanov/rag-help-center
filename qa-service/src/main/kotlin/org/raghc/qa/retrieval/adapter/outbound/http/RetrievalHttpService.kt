@@ -16,6 +16,7 @@ internal interface RetrievalHttpService {
 
 internal data class RetrievalSearchRequest(
     val query: String,
+    val collectionId: UUID?,
     val locale: String?,
     val topK: Int,
     val minimumScore: Double,
