@@ -15,6 +15,7 @@ class SpringAiKnowledgeSearchIndexTest {
     @Test
     fun `always applies tenant filter and maps attributable chunk metadata`() {
         val tenantId = UUID.randomUUID()
+        val collectionId = UUID.randomUUID()
         val articleId = UUID.randomUUID()
         val chunkId = UUID.randomUUID()
         vectorStore.results =
@@ -43,6 +44,7 @@ class SpringAiKnowledgeSearchIndexTest {
                     locale = "en",
                     topK = 5,
                     minimumScore = 0.8,
+                    collectionId = collectionId,
                 ),
             )
 
@@ -50,7 +52,7 @@ class SpringAiKnowledgeSearchIndexTest {
         assertThat(vectorStore.request.topK).isEqualTo(5)
         assertThat(vectorStore.request.similarityThreshold).isEqualTo(0.8)
         assertThat(vectorStore.request.filterExpression.toString())
-            .contains("tenantId", tenantId.toString(), "locale", "en")
+            .contains("tenantId", tenantId.toString(), "collectionId", collectionId.toString(), "locale", "en")
         val chunk = results.single()
         assertThat(chunk.chunkId).isEqualTo(chunkId)
         assertThat(chunk.articleId).isEqualTo(articleId)

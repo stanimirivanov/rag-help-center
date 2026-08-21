@@ -38,6 +38,7 @@ class KnowledgeSearchController(
                     request.locale,
                     request.topK,
                     request.minimumScore,
+                    request.collectionId,
                 ),
             ).map { it.toResponse() },
     )
@@ -56,6 +57,7 @@ class KnowledgeSearchController(
 
 data class KnowledgeSearchRequest(
     @field:NotBlank @field:Size(max = 2_000) val query: String,
+    val collectionId: UUID? = null,
     @field:Pattern(regexp = "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$") val locale: String? = null,
     @field:Min(1) @field:Max(MAX_TOP_K_VALIDATION) val topK: Int = SearchKnowledgeQuery.DEFAULT_TOP_K,
     @field:DecimalMin("0.0") @field:DecimalMax("1.0")

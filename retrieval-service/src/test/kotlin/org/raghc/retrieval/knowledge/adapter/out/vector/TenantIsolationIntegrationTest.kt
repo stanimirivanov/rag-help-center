@@ -120,21 +120,47 @@ class TenantIsolationIntegrationTest(
         assertThat(allRequestedTenantLocales.single().locale).isEqualTo("de")
     }
 
+    @Test
+    fun `database search restricts both channels to the requested collection`() {
+        val tenantId = UUID.randomUUID()
+        val requestedCollection = UUID.randomUUID()
+        val otherCollection = UUID.randomUUID()
+        val expectedArticle = UUID.randomUUID()
+        vectorStore.add(
+            listOf(
+                document(tenantId, expectedArticle, "en", "Collection-specific password answer", requestedCollection),
+                document(tenantId, UUID.randomUUID(), "en", "Other collection password answer", otherCollection),
+            ),
+        )
+        val query =
+            SearchKnowledgeQuery(
+                tenantId,
+                query = "password answer",
+                collectionId = requestedCollection,
+                minimumScore = 0.0,
+            )
+
+        assertThat(searchIndex.search(query)).extracting<UUID> { it.articleId }.containsExactly(expectedArticle)
+        assertThat(fullTextIndex.search(query)).extracting<UUID> { it.articleId }.containsExactly(expectedArticle)
+    }
+
     private fun document(
         tenantId: UUID,
         articleId: UUID,
         locale: String,
         content: String,
+        collectionId: UUID? = null,
     ) = Document(
         UUID.randomUUID().toString(),
         content,
-        mapOf(
-            "tenantId" to tenantId.toString(),
-            "articleId" to articleId.toString(),
-            "revision" to 1L,
-            "chunkIndex" to 0,
-            "locale" to locale,
-        ),
+        buildMap {
+            put("tenantId", tenantId.toString())
+            put("articleId", articleId.toString())
+            put("revision", 1L)
+            put("chunkIndex", 0)
+            put("locale", locale)
+            collectionId?.let { put("collectionId", it.toString()) }
+        },
     )
 
     @TestConfiguration(proxyBeanMethods = false)

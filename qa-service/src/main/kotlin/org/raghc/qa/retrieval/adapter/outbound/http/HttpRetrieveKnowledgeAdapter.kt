@@ -13,6 +13,7 @@ internal class HttpRetrieveKnowledgeAdapter(
                 query.tenantId,
                 RetrievalSearchRequest(
                     query = query.question,
+                    collectionId = query.collectionId,
                     locale = query.locale,
                     topK = query.topK,
                     minimumScore = query.minimumScore,

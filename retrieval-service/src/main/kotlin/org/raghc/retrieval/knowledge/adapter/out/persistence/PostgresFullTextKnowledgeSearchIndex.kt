@@ -22,6 +22,7 @@ class PostgresFullTextKnowledgeSearchIndex(
                    ts_rank_cd(to_tsvector('simple', content), websearch_to_tsquery('simple', :query)) as score
             from vector_store
             where metadata->>'tenantId' = :tenantId
+              and (cast(:collectionId as text) is null or metadata->>'collectionId' = :collectionId)
               and (cast(:locale as text) is null or metadata->>'locale' = :locale)
               and to_tsvector('simple', content) @@ websearch_to_tsquery('simple', :query)
               and ts_rank_cd(to_tsvector('simple', content), websearch_to_tsquery('simple', :query)) >= :minimumScore
@@ -31,6 +32,7 @@ class PostgresFullTextKnowledgeSearchIndex(
         return jdbcClient
             .sql(sql)
             .param("tenantId", query.tenantId.toString())
+            .param("collectionId", query.collectionId?.toString())
             .param("locale", query.locale)
             .param("query", query.query)
             .param("minimumScore", query.minimumScore)

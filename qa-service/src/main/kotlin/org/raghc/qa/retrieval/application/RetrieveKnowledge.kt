@@ -8,6 +8,7 @@ data class RetrievalQuery(
     val locale: String? = null,
     val topK: Int = 10,
     val minimumScore: Double = 0.65,
+    val collectionId: UUID? = null,
 )
 
 data class RetrievedChunk(

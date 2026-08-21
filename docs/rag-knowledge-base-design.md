@@ -52,7 +52,7 @@ Domain code has no Spring annotations. `domain-kernel` is kept intentionally sma
 
 ### REST instead of gRPC
 
-`qa-service` calls `retrieval-service` through a versioned internal JSON API, initially `POST /internal/v1/search`. The client is a Spring HTTP Service interface backed by `RestClient`. This choice keeps the demo operable with standard Kubernetes networking, security, tracing, contract tests, and command-line tools. The boundary can later be benchmarked before introducing a binary protocol.
+`qa-service` calls `retrieval-service` through a versioned internal JSON API, initially `POST /internal/v1/search`. The request carries the tenant in `X-Tenant-Id` and may restrict results with a tenant-scoped `collectionId` and locale. The client is a Spring HTTP Service interface backed by `RestClient`. This choice keeps the demo operable with standard Kubernetes networking, security, tracing, contract tests, and command-line tools. The boundary can later be benchmarked before introducing a binary protocol.
 
 Internal traffic is HTTP in local development and HTTPS/mTLS at the ingress or service-mesh layer in Kubernetes. APIs use RFC 9457 problem details and OpenAPI contracts. Network DTOs are owned by the adapter, not the domain.
 
