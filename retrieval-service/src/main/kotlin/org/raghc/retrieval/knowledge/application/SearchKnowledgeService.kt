@@ -11,13 +11,15 @@ class SearchKnowledgeService(
     override fun search(query: SearchKnowledgeQuery): List<KnowledgeChunk> {
         val scores = mutableMapOf<UUID, Double>()
         val chunks = mutableMapOf<UUID, KnowledgeChunk>()
-        addRanked(semanticIndex.search(query), scores, chunks)
-        addRanked(lexicalIndex.search(query), scores, chunks)
+        addRanked(semanticIndex.search(query).relevantTo(query), scores, chunks)
+        addRanked(lexicalIndex.search(query).relevantTo(query), scores, chunks)
         return chunks.values
             .map { it.copy(score = scores.getValue(it.chunkId) / MAXIMUM_RRF_SCORE) }
             .sortedWith(compareByDescending<KnowledgeChunk> { it.score }.thenBy { it.chunkId })
             .take(query.topK)
     }
+
+    private fun List<KnowledgeChunk>.relevantTo(query: SearchKnowledgeQuery) = filter { it.score >= query.minimumScore }
 
     private fun addRanked(
         ranked: List<KnowledgeChunk>,

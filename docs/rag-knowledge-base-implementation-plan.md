@@ -110,7 +110,7 @@ Scope:
 Acceptance criteria:
 
 - [x] known fixtures return correctly ranked, attributable chunks
-- [ ] low-relevance results are excluded
+- [x] low-relevance results are excluded
 - [x] tenant isolation is tested at the vector query adapter
 - [x] OpenAPI contract validation protects client/server compatibility
 - [x] HTTP timeouts and problem responses are explicit

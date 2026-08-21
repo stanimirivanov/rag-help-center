@@ -23,7 +23,10 @@ class SpringAiKnowledgeSearchIndex(
                 .similarityThreshold(query.minimumScore)
                 .filterExpression(filters(query))
                 .build()
-        return vectorStore.similaritySearch(request).map { it.toKnowledgeChunk() }
+        return vectorStore
+            .similaritySearch(request)
+            .map { it.toKnowledgeChunk() }
+            .filter { it.score >= query.minimumScore }
     }
 
     private fun filters(query: SearchKnowledgeQuery) =

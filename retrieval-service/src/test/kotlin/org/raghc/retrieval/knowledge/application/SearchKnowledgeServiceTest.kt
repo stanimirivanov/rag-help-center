@@ -41,14 +41,32 @@ class SearchKnowledgeServiceTest {
         assertThat(results).hasSize(1)
     }
 
-    private fun chunk(label: String) =
-        KnowledgeChunk(
-            UUID.nameUUIDFromBytes(label.toByteArray()),
-            UUID.randomUUID(),
-            1,
-            0,
-            "en",
-            label,
-            0.9,
-        )
+    @Test
+    fun `fusion excludes candidates below the requested relevance threshold`() {
+        val relevant = chunk("relevant", score = 0.8)
+        val weakSemantic = chunk("weak-semantic", score = 0.64)
+        val weakLexical = chunk("weak-lexical", score = 0.2)
+        val service =
+            SearchKnowledgeService(
+                SemanticKnowledgeSearchIndex { listOf(relevant, weakSemantic) },
+                LexicalKnowledgeSearchIndex { listOf(weakLexical) },
+            )
+
+        val results = service.search(SearchKnowledgeQuery(tenantId, "reset", minimumScore = 0.65))
+
+        assertThat(results).extracting<UUID> { it.chunkId }.containsExactly(relevant.chunkId)
+    }
+
+    private fun chunk(
+        label: String,
+        score: Double = 0.9,
+    ) = KnowledgeChunk(
+        UUID.nameUUIDFromBytes(label.toByteArray()),
+        UUID.randomUUID(),
+        1,
+        0,
+        "en",
+        label,
+        score,
+    )
 }
