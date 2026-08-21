@@ -112,7 +112,7 @@ Acceptance criteria:
 - [x] known fixtures return correctly ranked, attributable chunks
 - [ ] low-relevance results are excluded
 - [x] tenant isolation is tested at the vector query adapter
-- [ ] OpenAPI contract validation protects client/server compatibility
+- [x] OpenAPI contract validation protects client/server compatibility
 - [ ] HTTP timeouts and problem responses are explicit
 
 ## Phase 5 — Grounded Q&A and conversation persistence
