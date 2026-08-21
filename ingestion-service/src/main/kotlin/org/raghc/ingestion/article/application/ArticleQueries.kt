@@ -3,9 +3,11 @@ package org.raghc.ingestion.article.application
 import org.raghc.ingestion.article.domain.ArticleId
 import org.raghc.ingestion.article.domain.TenantId
 import java.time.OffsetDateTime
+import java.util.UUID
 
 data class ArticleView(
     val articleId: ArticleId,
+    val collectionId: UUID?,
     val title: String,
     val body: String,
     val locale: String,

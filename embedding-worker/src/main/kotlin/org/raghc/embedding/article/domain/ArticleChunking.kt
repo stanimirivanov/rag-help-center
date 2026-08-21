@@ -13,6 +13,7 @@ data class PublishedArticleRevision(
     val title: String,
     val body: String,
     val locale: String,
+    val collectionId: UUID? = null,
 ) {
     init {
         require(revision > 0) { "revision must be positive" }

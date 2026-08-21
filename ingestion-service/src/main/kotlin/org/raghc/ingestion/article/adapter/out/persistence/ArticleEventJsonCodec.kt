@@ -16,7 +16,7 @@ class ArticleEventJsonCodec(
     fun encode(event: ArticleEvent): EncodedArticleEvent =
         when (event) {
             is ArticleCreated -> {
-                EncodedArticleEvent("ArticleCreated", 1, objectMapper.writeValueAsString(event))
+                EncodedArticleEvent("ArticleCreated", 2, objectMapper.writeValueAsString(event))
             }
 
             is ArticleContentRevised -> {
@@ -41,7 +41,8 @@ class ArticleEventJsonCodec(
         schemaVersion: Int,
         payload: String,
     ): ArticleEvent {
-        require(schemaVersion == 1) { "unsupported $eventType schema version $schemaVersion" }
+        val supported = schemaVersion == 1 || (eventType == "ArticleCreated" && schemaVersion == 2)
+        require(supported) { "unsupported $eventType schema version $schemaVersion" }
         return when (eventType) {
             "ArticleCreated" -> objectMapper.readValue(payload, ArticleCreated::class.java)
             "ArticleContentRevised" -> objectMapper.readValue(payload, ArticleContentRevised::class.java)

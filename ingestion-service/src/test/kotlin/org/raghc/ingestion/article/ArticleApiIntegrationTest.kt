@@ -155,6 +155,7 @@ class ArticleApiIntegrationTest(
             .contains("traceId")
             .contains("Reset a password")
             .contains("Open account settings.")
+            .contains("11111111-1111-1111-1111-111111111111")
             .contains("\"revision\": 1")
 
         jdbcClient.sql("delete from article_projection").update()
@@ -165,6 +166,7 @@ class ArticleApiIntegrationTest(
             .perform(
                 get("/api/v1/articles/{articleId}", articleId).header("X-Tenant-Id", tenantId),
             ).andExpect(status().isOk)
+            .andExpect(jsonPath("$.collectionId").value("11111111-1111-1111-1111-111111111111"))
             .andExpect(jsonPath("$.lifecycleStatus").value("PUBLISHED"))
     }
 
@@ -198,7 +200,8 @@ class ArticleApiIntegrationTest(
 
     companion object {
         private const val CREATE_BODY =
-            """{"title":"Reset a password","body":"Open account settings.","locale":"en"}"""
+            """{"collectionId":"11111111-1111-1111-1111-111111111111","title":"Reset a password",""" +
+                """"body":"Open account settings.","locale":"en"}"""
         private const val REVISE_BODY =
             """{"title":"Reset a password","body":"Follow the updated instructions."}"""
 

@@ -6,6 +6,9 @@ class KnowledgeArticle private constructor(
     val id: ArticleId,
     val tenantId: TenantId,
 ) {
+    var collectionId: CollectionId? = null
+        private set
+
     lateinit var content: ArticleContent
         private set
 
@@ -59,6 +62,7 @@ class KnowledgeArticle private constructor(
         when (event) {
             is ArticleCreated -> {
                 content = ArticleContent.create(event.title, event.body, ArticleLocale.of(event.locale))
+                collectionId = event.collectionId?.let(::CollectionId)
             }
 
             is ArticleContentRevised -> {
@@ -87,9 +91,18 @@ class KnowledgeArticle private constructor(
             tenantId: TenantId,
             content: ArticleContent,
             occurredAt: Instant,
+            collectionId: CollectionId,
         ): KnowledgeArticle =
             KnowledgeArticle(id, tenantId).also {
-                it.record(ArticleCreated(content.title, content.body, content.locale.value, occurredAt))
+                it.record(
+                    ArticleCreated(
+                        content.title,
+                        content.body,
+                        content.locale.value,
+                        occurredAt,
+                        collectionId.value,
+                    ),
+                )
             }
 
         fun rehydrate(

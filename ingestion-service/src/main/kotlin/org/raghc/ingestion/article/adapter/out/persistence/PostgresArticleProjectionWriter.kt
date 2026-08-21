@@ -43,18 +43,20 @@ class PostgresArticleProjectionWriter(
             .sql(
                 """
                 insert into article_projection
-                    (tenant_id, article_id, title, body, locale, lifecycle_status, revision,
+                    (tenant_id, article_id, collection_id, title, body, locale, lifecycle_status, revision,
                      stream_version, indexing_status, updated_at)
-                values (:tenantId, :articleId, :title, :body, :locale, :status, :revision,
+                values (:tenantId, :articleId, :collectionId, :title, :body, :locale, :status, :revision,
                         :streamVersion, :indexingStatus, :updatedAt)
                 on conflict (tenant_id, article_id) do update set
-                    title = excluded.title, body = excluded.body, locale = excluded.locale,
+                    collection_id = excluded.collection_id, title = excluded.title,
+                    body = excluded.body, locale = excluded.locale,
                     lifecycle_status = excluded.lifecycle_status, revision = excluded.revision,
                     stream_version = excluded.stream_version, indexing_status = excluded.indexing_status,
                     updated_at = excluded.updated_at
                 """.trimIndent(),
             ).param("tenantId", article.tenantId.value)
             .param("articleId", article.id.value)
+            .param("collectionId", article.collectionId?.value)
             .param("title", article.content.title)
             .param("body", article.content.body)
             .param("locale", article.content.locale.value)
@@ -157,6 +159,7 @@ class PostgresArticleProjectionWriter(
                     "title" to article.content.title,
                     "body" to article.content.body,
                     "locale" to article.content.locale.value,
+                    "collectionId" to article.collectionId?.value,
                 )
             }
 

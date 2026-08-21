@@ -47,6 +47,7 @@ class SpringAiArticleVectorProjection(
             mapOf(
                 TENANT_ID to article.tenantId.toString(),
                 ARTICLE_ID to article.articleId.toString(),
+                COLLECTION_ID to requireNotNull(article.collectionId).toString(),
                 REVISION to article.revision,
                 CHUNK_INDEX to index,
                 LOCALE to article.locale,
@@ -56,6 +57,7 @@ class SpringAiArticleVectorProjection(
     private companion object {
         const val TENANT_ID = "tenantId"
         const val ARTICLE_ID = "articleId"
+        const val COLLECTION_ID = "collectionId"
         const val REVISION = "revision"
         const val CHUNK_INDEX = "chunkIndex"
         const val LOCALE = "locale"

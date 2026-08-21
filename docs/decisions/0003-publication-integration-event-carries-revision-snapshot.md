@@ -5,7 +5,7 @@
 
 ## Context
 
-The embedding worker needs the exact published title, body, locale, and revision
+The embedding worker needs the exact published title, body, locale, collection, and revision
 to produce a replayable vector projection. Publishing only a revision number
 would force a synchronous callback into the ingestion service and could return
 content newer than the event being processed.
@@ -13,7 +13,8 @@ content newer than the event being processed.
 ## Decision
 
 - `ArticlePublished` and `ArticleRestored` integration envelopes contain the
-  immutable revision snapshot: revision, title, body, and locale.
+  immutable revision snapshot: revision, title, body, locale, and tenant-scoped
+  collection ID.
 - Domain events remain minimal and continue to represent aggregate decisions.
   The outbox adapter maps them to independently versioned integration contracts.
 - `ArticleWithdrawn` carries the affected revision and aggregate metadata but

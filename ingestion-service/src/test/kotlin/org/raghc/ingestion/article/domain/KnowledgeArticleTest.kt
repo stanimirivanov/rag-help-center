@@ -10,6 +10,7 @@ import java.util.UUID
 class KnowledgeArticleTest {
     private val articleId = ArticleId(UUID.randomUUID())
     private val tenantId = TenantId(UUID.randomUUID())
+    private val collectionId = CollectionId(UUID.randomUUID())
     private val createdAt = Instant.parse("2026-08-18T08:00:00Z")
 
     @Test
@@ -20,11 +21,12 @@ class KnowledgeArticleTest {
                 tenantId,
                 content("Reset a password", "Choose Forgot password."),
                 createdAt,
+                collectionId,
             )
 
         assertThat(article.streamVersion).isEqualTo(1)
         assertThat(article.pendingEvents()).containsExactly(
-            ArticleCreated("Reset a password", "Choose Forgot password.", "en", createdAt),
+            ArticleCreated("Reset a password", "Choose Forgot password.", "en", createdAt, collectionId.value),
         )
     }
 
@@ -58,6 +60,7 @@ class KnowledgeArticleTest {
                 tenantId,
                 content("Reset a password", "Instructions"),
                 createdAt,
+                collectionId,
             )
 
         assertThatThrownBy {
@@ -68,7 +71,7 @@ class KnowledgeArticleTest {
 
     @Test
     fun `enforces publication withdrawal and restoration lifecycle`() {
-        val article = KnowledgeArticle.create(articleId, tenantId, content("Title", "Body"), createdAt)
+        val article = KnowledgeArticle.create(articleId, tenantId, content("Title", "Body"), createdAt, collectionId)
         article.publish(createdAt.plusSeconds(1))
         article.withdraw(createdAt.plusSeconds(2))
         article.restore(createdAt.plusSeconds(3))

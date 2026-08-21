@@ -3,6 +3,7 @@ package org.raghc.ingestion.article.application
 import org.raghc.ingestion.article.domain.ArticleContent
 import org.raghc.ingestion.article.domain.ArticleId
 import org.raghc.ingestion.article.domain.ArticleLocale
+import org.raghc.ingestion.article.domain.CollectionId
 import org.raghc.ingestion.article.domain.KnowledgeArticle
 import org.raghc.ingestion.article.domain.TenantId
 import org.springframework.stereotype.Service
@@ -17,6 +18,7 @@ data class CreateArticleCommand(
     val body: String,
     val locale: String,
     val idempotencyKey: String?,
+    val collectionId: CollectionId,
 )
 
 data class ReviseArticleCommand(
@@ -54,7 +56,7 @@ class ArticleCommandService(
             command.tenantId,
             command.idempotencyKey,
             "CREATE",
-            "${command.title}\u0000${command.body}\u0000${command.locale}",
+            "${command.title}\u0000${command.body}\u0000${command.locale}\u0000${command.collectionId.value}",
         ) {
             val article =
                 KnowledgeArticle.create(
@@ -62,6 +64,7 @@ class ArticleCommandService(
                     command.tenantId,
                     ArticleContent.create(command.title, command.body, ArticleLocale.of(command.locale)),
                     clock.instant(),
+                    command.collectionId,
                 )
             persist(article, 0)
         }
