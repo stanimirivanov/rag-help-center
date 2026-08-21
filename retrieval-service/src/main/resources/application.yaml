@@ -9,5 +9,11 @@ spring:
     vectorstore:
       pgvector:
         initialize-schema: false
+  mvc:
+    async:
+      request-timeout: 5s
 server:
   port: 8083
+  tomcat:
+    connection-timeout: 5s
+    keep-alive-timeout: 20s
