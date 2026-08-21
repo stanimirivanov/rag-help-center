@@ -58,6 +58,46 @@ class SpringAiKnowledgeSearchIndexTest {
         assertThat(chunk.score).isEqualTo(0.91)
     }
 
+    @Test
+    fun `defensively excludes results below the requested similarity threshold`() {
+        val tenantId = UUID.randomUUID()
+        vectorStore.results =
+            listOf(
+                document(tenantId, "relevant", 0.81),
+                document(tenantId, "weak", 0.79),
+            )
+
+        val results =
+            searchIndex.search(
+                org.raghc.retrieval.knowledge.application.SearchKnowledgeQuery(
+                    tenantId,
+                    "reset password",
+                    minimumScore = 0.8,
+                ),
+            )
+
+        assertThat(results).extracting<String> { it.content }.containsExactly("relevant")
+    }
+
+    private fun document(
+        tenantId: UUID,
+        content: String,
+        score: Double,
+    ) = Document
+        .builder()
+        .id(UUID.randomUUID().toString())
+        .text(content)
+        .metadata(
+            mapOf(
+                "tenantId" to tenantId.toString(),
+                "articleId" to UUID.randomUUID().toString(),
+                "revision" to 1L,
+                "chunkIndex" to 0,
+                "locale" to "en",
+            ),
+        ).score(score)
+        .build()
+
     private class RecordingVectorStore : VectorStore {
         lateinit var request: SearchRequest
         var results: List<Document> = emptyList()

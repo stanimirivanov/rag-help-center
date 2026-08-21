@@ -24,6 +24,7 @@ class PostgresFullTextKnowledgeSearchIndex(
             where metadata->>'tenantId' = :tenantId
               and (cast(:locale as text) is null or metadata->>'locale' = :locale)
               and to_tsvector('simple', content) @@ websearch_to_tsquery('simple', :query)
+              and ts_rank_cd(to_tsvector('simple', content), websearch_to_tsquery('simple', :query)) >= :minimumScore
             order by score desc, id
             limit :topK
             """.trimIndent()
@@ -32,6 +33,7 @@ class PostgresFullTextKnowledgeSearchIndex(
             .param("tenantId", query.tenantId.toString())
             .param("locale", query.locale)
             .param("query", query.query)
+            .param("minimumScore", query.minimumScore)
             .param("topK", query.topK)
             .query { row, _ ->
                 KnowledgeChunk(
