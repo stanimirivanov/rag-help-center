@@ -13,6 +13,11 @@ value class TenantId(
 )
 
 @JvmInline
+value class CollectionId(
+    val value: UUID,
+)
+
+@JvmInline
 value class ArticleLocale private constructor(
     val value: String,
 ) {

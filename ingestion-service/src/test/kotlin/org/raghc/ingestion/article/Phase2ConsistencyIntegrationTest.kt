@@ -48,7 +48,18 @@ class Phase2ConsistencyIntegrationTest(
     fun `rolls back event projection outbox and idempotency when the outbox write fails`() {
         clearOutbox()
         val tenantId = TenantId(UUID.randomUUID())
-        val created = commandService.create(CreateArticleCommand(tenantId, "Rollback", "Initial content", "en", null))
+        val created =
+            commandService.create(
+                CreateArticleCommand(
+                    tenantId,
+                    "Rollback",
+                    "Initial content",
+                    "en",
+                    null,
+                    org.raghc.ingestion.article.domain
+                        .CollectionId(UUID.randomUUID()),
+                ),
+            )
         val commandKey = "rollback-${UUID.randomUUID()}"
         insertOutboxRow(tenantId.value, created.articleId.value, 2)
 

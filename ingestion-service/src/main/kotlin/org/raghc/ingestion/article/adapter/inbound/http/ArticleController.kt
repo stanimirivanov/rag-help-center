@@ -15,6 +15,7 @@ import org.raghc.ingestion.article.application.ReviseArticleCommand
 import org.raghc.ingestion.article.domain.ArticleContent
 import org.raghc.ingestion.article.domain.ArticleId
 import org.raghc.ingestion.article.domain.ArticleLocale
+import org.raghc.ingestion.article.domain.CollectionId
 import org.raghc.ingestion.article.domain.TenantId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -49,6 +50,7 @@ class ArticleController(
                     request.body,
                     request.locale,
                     idempotencyKey,
+                    CollectionId(request.collectionId),
                 ),
             )
         return ResponseEntity
@@ -154,6 +156,7 @@ class ArticleController(
 }
 
 data class CreateArticleRequest(
+    val collectionId: UUID,
     @field:NotBlank @field:Size(max = ArticleContent.MAX_TITLE_LENGTH) val title: String,
     @field:NotBlank @field:Size(max = ArticleContent.MAX_BODY_LENGTH) val body: String,
     @field:Pattern(regexp = ArticleLocale.LANGUAGE_TAG_PATTERN) val locale: String,

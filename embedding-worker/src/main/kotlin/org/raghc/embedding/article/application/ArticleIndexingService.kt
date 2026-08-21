@@ -33,6 +33,7 @@ class ArticleIndexingService(
                 requireNotNull(event.data.title) { "published title is required" },
                 requireNotNull(event.data.body) { "published body is required" },
                 requireNotNull(event.data.locale) { "published locale is required" },
+                requireNotNull(event.data.collectionId) { "published collectionId is required" },
             )
         val chunks = chunker.chunk(article)
         vectorProjection.replace(article, chunks)

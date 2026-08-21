@@ -111,7 +111,7 @@ Progress:
 
 - [x] retrieval and QA contracts accept an optional tenant-scoped `collectionId`
 - [x] semantic and lexical adapters enforce collection isolation
-- [ ] ingestion and embedding propagate immutable article collection membership
+- [x] ingestion and embedding propagate immutable article collection membership
 
 Acceptance criteria:
 

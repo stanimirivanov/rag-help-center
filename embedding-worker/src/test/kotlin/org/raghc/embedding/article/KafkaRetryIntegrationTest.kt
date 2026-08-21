@@ -117,7 +117,8 @@ class KafkaRetryIntegrationTest(
           "aggregateId":"${UUID.randomUUID()}",
           "streamVersion":1,
           "occurredAt":"2026-08-20T12:00:00Z",
-          "data":{"revision":1,"title":"Reset password","body":"Use settings.","locale":"en"}
+          "data":{"revision":1,"title":"Reset password","body":"Use settings.","locale":"en",
+                  "collectionId":"${UUID.randomUUID()}"}
         }
         """.trimIndent()
 

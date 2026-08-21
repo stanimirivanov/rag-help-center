@@ -20,4 +20,5 @@ data class ArticleRevisionData(
     val title: String? = null,
     val body: String? = null,
     val locale: String? = null,
+    val collectionId: UUID? = null,
 )

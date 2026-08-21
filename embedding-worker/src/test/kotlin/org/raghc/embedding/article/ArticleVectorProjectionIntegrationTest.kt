@@ -27,6 +27,7 @@ class ArticleVectorProjectionIntegrationTest(
 ) {
     private val tenantId = UUID.randomUUID()
     private val articleId = UUID.randomUUID()
+    private val collectionId = UUID.randomUUID()
 
     @Test
     fun `redelivery replacement and withdrawal preserve one active revision`() {
@@ -37,6 +38,7 @@ class ArticleVectorProjectionIntegrationTest(
         assertThat(count("embedding_inbox")).isEqualTo(1)
         assertThat(count("embedding_status_outbox")).isEqualTo(1)
         assertThat(indexedRevisions()).containsExactly(1L)
+        assertThat(indexedCollections()).containsExactly(collectionId)
 
         indexingService.handle(event("ArticleRestored", 2))
 
@@ -66,6 +68,7 @@ class ArticleVectorProjectionIntegrationTest(
             "Reset a password".takeIf { includeContent },
             "Open settings and follow the reset instructions.".takeIf { includeContent },
             "en".takeIf { includeContent },
+            collectionId.takeIf { includeContent },
         ),
     )
 
@@ -86,6 +89,18 @@ class ArticleVectorProjectionIntegrationTest(
             ).param("tenantId", tenantId.toString())
             .param("articleId", articleId.toString())
             .query { resultSet, _ -> resultSet.getLong("revision") }
+            .list()
+
+    private fun indexedCollections(): List<UUID> =
+        jdbcClient
+            .sql(
+                """
+                select distinct (metadata->>'collectionId')::uuid as collection_id from vector_store
+                where metadata->>'tenantId' = :tenantId and metadata->>'articleId' = :articleId
+                """.trimIndent(),
+            ).param("tenantId", tenantId.toString())
+            .param("articleId", articleId.toString())
+            .query { resultSet, _ -> resultSet.getObject("collection_id", UUID::class.java) }
             .list()
 
     companion object {

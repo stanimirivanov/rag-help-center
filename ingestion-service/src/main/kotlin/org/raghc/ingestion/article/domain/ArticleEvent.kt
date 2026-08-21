@@ -11,6 +11,7 @@ data class ArticleCreated(
     val body: String,
     val locale: String,
     override val occurredAt: Instant,
+    val collectionId: java.util.UUID? = null,
 ) : ArticleEvent
 
 data class ArticleContentRevised(

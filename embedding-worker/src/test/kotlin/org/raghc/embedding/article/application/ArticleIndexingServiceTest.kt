@@ -12,6 +12,7 @@ import java.util.UUID
 class ArticleIndexingServiceTest {
     private val tenantId = UUID.randomUUID()
     private val articleId = UUID.randomUUID()
+    private val collectionId = UUID.randomUUID()
     private val projection = RecordingProjection()
     private val checkpoint = RecordingCheckpoint()
     private val service = ArticleIndexingService(FixedWindowArticleChunker(), projection, checkpoint)
@@ -24,6 +25,7 @@ class ArticleIndexingServiceTest {
         service.handle(event)
 
         assertThat(projection.replacements).hasSize(1)
+        assertThat(projection.replacements.single().collectionId).isEqualTo(collectionId)
         assertThat(checkpoint.statuses).containsExactly("INDEXED")
     }
 
@@ -60,6 +62,7 @@ class ArticleIndexingServiceTest {
                 "Reset a password".takeIf { content },
                 "Follow the instructions.".takeIf { content },
                 "en".takeIf { content },
+                collectionId.takeIf { content },
             ),
         )
 
