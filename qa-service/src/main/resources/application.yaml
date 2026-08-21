@@ -3,3 +3,8 @@ spring:
     name: qa-service
 server:
   port: 8084
+app:
+  retrieval:
+    base-url: http://retrieval-service:8083
+    connect-timeout: 2s
+    read-timeout: 5s

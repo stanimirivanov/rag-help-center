@@ -8,3 +8,6 @@ spring:
   ai:
     ollama:
       base-url: http://localhost:11434
+app:
+  retrieval:
+    base-url: http://localhost:8083
