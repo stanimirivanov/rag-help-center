@@ -1,15 +1,35 @@
 # RAG Help Center
 
-A backend-only reference project for a versioned, AI-powered help center, built with Kotlin and the current Spring ecosystem. It combines a focused event-sourced article lifecycle with CQRS projections, Kafka-driven indexing, hybrid retrieval, and citation-grounded Q&A.
+A backend-only reference project for a versioned, AI-powered help center, built
+with Kotlin and the current Spring ecosystem. It combines a focused
+event-sourced article lifecycle with CQRS projections, Kafka-driven indexing,
+hybrid retrieval, and citation-grounded Q&A.
 
-**Phase 4 is complete:** the embedding pipeline provides deterministic chunking, Spring AI `EmbeddingModel`/`VectorStore` integration, transactional idempotency, pgvector revision replacement, collection metadata, and Kafka retry/DLT recovery. Retrieval has a tenant-safe `SearchKnowledge` port, semantic and PostgreSQL full-text adapters, relevance-thresholded reciprocal-rank fusion, a versioned OpenAPI-tested internal REST endpoint, database-backed tenant/locale/collection isolation, RFC 9457 validation responses, and explicit server and client timeout limits. The QA service consumes that contract through a typed Spring HTTP Service client.
+**Phase 4 is complete:** the embedding pipeline provides deterministic chunking,
+Spring AI `EmbeddingModel`/`VectorStore` integration, transactional idempotency,
+pgvector revision replacement, collection metadata, and Kafka retry/DLT
+recovery. Retrieval has a tenant-safe `SearchKnowledge` port, semantic and
+PostgreSQL full-text adapters, relevance-thresholded reciprocal-rank fusion, a
+versioned OpenAPI-tested internal REST endpoint, database-backed
+tenant/locale/collection isolation, RFC 9457 validation responses, and explicit
+server and client timeout limits. The QA service consumes that contract through
+a typed Spring HTTP Service client.
+
+**Phase 5 is in progress:** the QA application core gates model calls on
+retrieved context, distinguishes answered, insufficient-context, and
+model-unavailable outcomes, and validates every model citation against retrieved
+chunk metadata.
 
 Current command API:
 
-- `POST /api/v1/articles` creates a draft and returns `Location`, `ETag`, article ID, and stream version.
-- `PUT /api/v1/articles/{id}/content` revises a draft using `If-Match: "<stream-version>"`.
-- `X-Tenant-Id` supplies provisional tenant context until JWT claim extraction replaces it in Phase 6.
-- RFC 9457 problem details represent invalid commands, missing articles, and version conflicts.
+- `POST /api/v1/articles` creates a draft and returns `Location`, `ETag`,
+  article ID, and stream version.
+- `PUT /api/v1/articles/{id}/content` revises a draft using
+  `If-Match: "<stream-version>"`.
+- `X-Tenant-Id` supplies provisional tenant context until JWT claim extraction
+  replaces it in Phase 6.
+- RFC 9457 problem details represent invalid commands, missing articles, and
+  version conflicts.
 
 ## Architecture
 
@@ -29,16 +49,19 @@ flowchart LR
     QA --> Model[Chat model]
 ```
 
-| Module | Port | Role |
-|---|---:|---|
-| `gateway` | 8080 | Public Spring Cloud Gateway boundary |
+| Module              | Port | Role                                                    |
+|---------------------|-----:|---------------------------------------------------------|
+| `gateway`           | 8080 | Public Spring Cloud Gateway boundary                    |
 | `ingestion-service` | 8081 | Article commands, event store, CQRS projections, outbox |
-| `embedding-worker` | 8082 | Kafka-driven chunking and vector indexing |
-| `retrieval-service` | 8083 | Internal HTTPS/JSON hybrid retrieval API |
-| `qa-service` | 8084 | Grounded Q&A and conversation history |
-| `domain-kernel` | — | Small pure-Kotlin shared primitives |
+| `embedding-worker`  | 8082 | Kafka-driven chunking and vector indexing               |
+| `retrieval-service` | 8083 | Internal HTTPS/JSON hybrid retrieval API                |
+| `qa-service`        | 8084 | Grounded Q&A and conversation history                   |
+| `domain-kernel`     |    — | Small pure-Kotlin shared primitives                     |
 
-The detailed rationale is in [the architecture document](docs/rag-knowledge-base-design.md); executable phases and acceptance criteria are in [the implementation plan](docs/rag-knowledge-base-implementation-plan.md).
+The detailed rationale is
+in [the architecture document](docs/rag-knowledge-base-design.md); executable
+phases and acceptance criteria are
+in [the implementation plan](docs/rag-knowledge-base-implementation-plan.md).
 
 ## Technology baseline
 
@@ -69,7 +92,8 @@ Linux/macOS:
 ./mvnw -B -ntp verify
 ```
 
-`verify` runs tests, ktlint, and detekt. Apply Kotlin formatting with `./mvnw ktlint:format`.
+`verify` runs tests, ktlint, and detekt. Apply Kotlin formatting with
+`./mvnw ktlint:format`.
 
 ## Local infrastructure
 
@@ -79,7 +103,8 @@ Start the required data and messaging services:
 docker compose up -d postgres redis mongodb kafka
 ```
 
-Ollama is optional until the embedding and Q&A phases. Start it through the profile and pull the models chosen by that phase:
+Ollama is optional until the embedding and Q&A phases. Start it through the
+profile and pull the models chosen by that phase:
 
 ```bash
 docker compose --profile ai up -d ollama
@@ -91,15 +116,9 @@ Run one service with its local profile:
 ./mvnw -pl ingestion-service spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-Default local credentials are deliberately disposable and confined to `docker-compose.yml`. Kubernetes and non-local profiles obtain secrets externally.
-
-## Design highlights
-
-- `KnowledgeArticle` is event sourced because revision and publication history have domain value; Kafka remains an integration transport, not the event store.
-- CQRS read projections serve article/status queries and vector retrieval.
-- `qa-service` calls `retrieval-service` through a Spring HTTP Service client over a versioned internal REST contract; gRPC is not used.
-- A separate Admin API and Config Server were removed: admin commands belong with the article aggregate, while Kubernetes supplies configuration and service discovery.
-- AI-dependent integration tests use deterministic fakes by default, keeping CI free of API keys and model downloads.
+Default local credentials are deliberately disposable and confined to
+`docker-compose.yml`. Kubernetes and non-local profiles obtain secrets
+externally.
 
 ## Container images
 
@@ -109,4 +128,6 @@ Each executable module uses Jib. Build into the local Docker daemon with:
 ./mvnw -pl ingestion-service -am package jib:dockerBuild
 ```
 
-Registry publishing uses `fra.ocir.io/${OCIR_NAMESPACE}/rag-help-center/<module>` and external Docker/Jib credentials. CI does not publish images during Phase 0.
+Registry publishing uses
+`fra.ocir.io/${OCIR_NAMESPACE}/rag-help-center/<module>` and external Docker/Jib
+credentials. CI does not publish images during Phase 0.
