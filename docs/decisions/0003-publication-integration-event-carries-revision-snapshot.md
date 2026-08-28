@@ -5,10 +5,10 @@
 
 ## Context
 
-The embedding worker needs the exact published title, body, locale, collection, and revision
-to produce a replayable vector projection. Publishing only a revision number
-would force a synchronous callback into the ingestion service and could return
-content newer than the event being processed.
+The embedding worker needs the exact published title, body, locale, collection,
+and revision to produce a replayable vector projection. Publishing only a
+revision number would force a synchronous callback into the ingestion service
+and could return content newer than the event being processed.
 
 ## Decision
 
